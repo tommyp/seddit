@@ -80,6 +80,7 @@ defmodule SedditWeb.Router do
       live "/users/confirm", UserConfirmationInstructionsLive, :new
 
       live "/", PostsLive, :index
+      live "/posts/:id", PostLive, :show
     end
   end
 end

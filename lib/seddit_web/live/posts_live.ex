@@ -12,8 +12,10 @@ defmodule SedditWeb.PostsLive do
     <section class="">
       <h1 class="text-4xl mb-12">All posts</h1>
       <ul>
-        <li :for={post <- @posts} class="mt-2 pb-3 last:border-0 border-b-2 border-gray-700">
-          <h2 class="text-6xl"><%= post.title %></h2>
+        <li :for={post <- @posts} class="last:border-0 border-b-2 border-gray-700">
+          <h2 class="text-6xl hover:text-white hover:bg-black  py-6">
+            <a href={~p"/posts/#{post.id}"}><%= post.title %></a>
+          </h2>
         </li>
       </ul>
     </section>

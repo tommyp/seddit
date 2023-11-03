@@ -38,6 +38,14 @@ defmodule Seddit.Posts do
   """
   def get_post!(id), do: Repo.get!(Post, id)
 
+  def get_post_for_render!(id) do
+    from(p in Post,
+      where: p.id == ^id,
+      preload: [:user]
+    )
+    |> Repo.one!()
+  end
+
   @doc """
   Creates a post.
 
