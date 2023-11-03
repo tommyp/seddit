@@ -19,8 +19,6 @@ defmodule SedditWeb.Router do
 
   scope "/", SedditWeb do
     pipe_through :browser
-
-    get "/", PageController, :home
   end
 
   # Other scopes may use custom stacks.
@@ -80,6 +78,9 @@ defmodule SedditWeb.Router do
       on_mount: [{SedditWeb.UserAuth, :mount_current_user}] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
+
+      live "/", PostsLive, :index
+      live "/posts/:id", PostLive, :show
     end
   end
 end
