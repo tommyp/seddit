@@ -41,7 +41,7 @@ defmodule Seddit.Posts do
   def get_post_for_render!(id) do
     from(p in Post,
       where: p.id == ^id,
-      preload: [:user]
+      preload: [:user, comments: :user]
     )
     |> Repo.one!()
   end

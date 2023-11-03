@@ -39,7 +39,7 @@ users
   1..5
   |> Enum.map(fn _i ->
     {:ok, comment} =
-      Posts.create_comment(user, post, %{
+      Posts.create_comment(Enum.random(users), post, %{
         content: Faker.Lorem.paragraph()
       })
   end)

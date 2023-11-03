@@ -33,7 +33,11 @@ defmodule Seddit.PostsFixtures do
       })
 
     {:ok, comment} =
-      Seddit.Posts.create_comment(AccountsFixtures.user_fixture(), post_fixture(), attrs)
+      Seddit.Posts.create_comment(
+        Map.get(attrs, :user, AccountsFixtures.user_fixture()),
+        Map.get(attrs, :post, post_fixture()),
+        attrs
+      )
 
     comment
   end
