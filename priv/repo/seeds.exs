@@ -35,4 +35,12 @@ users
       content: Faker.Lorem.paragraph(),
       user_id: user.id
     })
+
+  1..5
+  |> Enum.map(fn _i ->
+    {:ok, comment} =
+      Posts.create_comment(user, post, %{
+        content: Faker.Lorem.paragraph()
+      })
+  end)
 end)

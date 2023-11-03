@@ -10,6 +10,7 @@ defmodule Seddit.Posts.Post do
     field :title, :string
     field :content, :string
     belongs_to :user, User
+    has_many :comments, Seddit.Posts.Comment
 
     timestamps(type: :utc_datetime)
   end

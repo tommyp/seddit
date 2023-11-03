@@ -21,4 +21,20 @@ defmodule Seddit.PostsFixtures do
 
     post
   end
+
+  @doc """
+  Generate a comment.
+  """
+  def comment_fixture(attrs \\ %{}) do
+    attrs =
+      attrs
+      |> Enum.into(%{
+        content: "some content"
+      })
+
+    {:ok, comment} =
+      Seddit.Posts.create_comment(AccountsFixtures.user_fixture(), post_fixture(), attrs)
+
+    comment
+  end
 end
