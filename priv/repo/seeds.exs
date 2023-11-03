@@ -11,13 +11,28 @@
 # and so on) as they will fail if something goes wrong.
 
 alias Seddit.Accounts
+alias Seddit.Posts
 
-1..5
-|> Enum.each(fn _i ->
-  {:ok, user} =
-    Accounts.register_user(%{
-      username: Faker.Internet.user_name(),
-      email: Faker.Internet.email(),
-      password: "password1234"
+users =
+  1..5
+  |> Enum.map(fn _i ->
+    {:ok, user} =
+      Accounts.register_user(%{
+        username: Faker.Internet.user_name(),
+        email: Faker.Internet.email(),
+        password: "password1234"
+      })
+
+    user
+  end)
+
+users
+|> Enum.shuffle()
+|> Enum.each(fn user ->
+  {:ok, post} =
+    Posts.create_post(user, %{
+      title: Faker.Lorem.sentence(),
+      content: Faker.Lorem.paragraph(),
+      user_id: user.id
     })
 end)

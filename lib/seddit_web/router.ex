@@ -78,6 +78,8 @@ defmodule SedditWeb.Router do
       on_mount: [{SedditWeb.UserAuth, :mount_current_user}] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
+
+      live "/", PostsLive, :index
     end
   end
 end
