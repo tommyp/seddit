@@ -7,7 +7,21 @@ defmodule Seddit.Posts do
   alias Seddit.Repo
 
   alias Seddit.Accounts.User
+  alias Seddit.Posts.Comment
   alias Seddit.Posts.Post
+
+  def subscribe(post_id) do
+    Phoenix.PubSub.subscribe(Seddit.PubSub, "post:" <> post_id)
+  end
+
+  def broadcast({:ok, comment}, tag) do
+    comment = get_comment_for_render!(comment.id)
+    Phoenix.PubSub.broadcast(Seddit.PubSub, "post:" <> comment.post_id, {tag, comment})
+
+    {:ok, comment}
+  end
+
+  def broadcast({:error, _changeset} = error, _tag), do: error
 
   @doc """
   Returns the list of posts.
@@ -41,7 +55,7 @@ defmodule Seddit.Posts do
   def get_post_for_render!(id) do
     from(p in Post,
       where: p.id == ^id,
-      preload: [:user, comments: :user]
+      preload: [:user]
     )
     |> Repo.one!()
   end
@@ -128,6 +142,19 @@ defmodule Seddit.Posts do
     Repo.all(Comment)
   end
 
+  defp user_preload do
+    from(u in User, select: [:email])
+  end
+
+  def list_comments_for_post(%Post{} = post) do
+    from(c in Comment,
+      where: c.post_id == ^post.id,
+      order_by: [desc: c.inserted_at],
+      preload: [user: ^user_preload()]
+    )
+    |> Repo.all()
+  end
+
   @doc """
   Gets a single comment.
 
@@ -143,6 +170,14 @@ defmodule Seddit.Posts do
 
   """
   def get_comment!(id), do: Repo.get!(Comment, id)
+
+  def get_comment_for_render!(id) do
+    from(c in Comment,
+      where: c.id == ^id,
+      preload: [user: ^user_preload()]
+    )
+    |> Repo.one!()
+  end
 
   @doc """
   Creates a comment.
@@ -163,6 +198,7 @@ defmodule Seddit.Posts do
     }
     |> Comment.changeset(attrs)
     |> Repo.insert()
+    |> broadcast(:comment_created)
   end
 
   @doc """

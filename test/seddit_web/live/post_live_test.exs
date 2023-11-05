@@ -39,14 +39,18 @@ defmodule SedditWeb.PostLiveTest do
 
   test "posting a comment when signed in", %{conn: conn} do
     post = post_fixture()
+    post_id = post.id
 
     {:ok, view, _html} =
       conn
       |> log_in_user(user_fixture())
-      |> live(~p"/posts/#{post.id}")
+      |> live(~p"/posts/#{post_id}")
 
-    assert view
-           |> render_submit("comment:create", %{comment: %{content: "Test comment"}}) =~
-             "Test comment"
+    view
+    |> render_submit("comment:create", %{comment: %{content: "Test comment"}})
+
+    :timer.sleep(100)
+
+    assert render(view) =~ "Test comment"
   end
 end
