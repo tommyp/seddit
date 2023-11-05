@@ -2,6 +2,7 @@ defmodule SedditWeb.PostLiveTest do
   use SedditWeb.ConnCase
 
   import Phoenix.LiveViewTest
+  import Seddit.AccountsFixtures
   import Seddit.PostsFixtures
 
   describe "Post show" do
@@ -14,7 +15,7 @@ defmodule SedditWeb.PostLiveTest do
           comment_fixture(%{post: post})
         end)
 
-      {:ok, _lv, html} = live(conn, ~p"/posts/#{post.id}")
+      {:ok, _view, html} = live(conn, ~p"/posts/#{post.id}")
 
       assert html =~ post.title
       assert html =~ post.content
@@ -24,5 +25,28 @@ defmodule SedditWeb.PostLiveTest do
         assert html =~ comment.content
       end)
     end
+  end
+
+  test "posting a comment requires a signed in user", %{conn: conn} do
+    post = post_fixture()
+
+    {:ok, _view, html} =
+      conn
+      |> live(~p"/posts/#{post.id}")
+
+    assert html =~ "Sign in to post a comment"
+  end
+
+  test "posting a comment when signed in", %{conn: conn} do
+    post = post_fixture()
+
+    {:ok, view, _html} =
+      conn
+      |> log_in_user(user_fixture())
+      |> live(~p"/posts/#{post.id}")
+
+    assert view
+           |> render_submit("comment:create", %{comment: %{content: "Test comment"}}) =~
+             "Test comment"
   end
 end
