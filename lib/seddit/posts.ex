@@ -14,7 +14,18 @@ defmodule Seddit.Posts do
     Phoenix.PubSub.subscribe(Seddit.PubSub, "post:" <> post_id)
   end
 
-  def broadcast({:ok, comment}, tag) do
+  def subscribe() do
+    Phoenix.PubSub.subscribe(Seddit.PubSub, "posts")
+  end
+
+  def broadcast({:ok, %Post{} = post}, tag) do
+    post = get_post_for_render!(post.id)
+    Phoenix.PubSub.broadcast(Seddit.PubSub, "posts", {tag, post})
+
+    {:ok, post}
+  end
+
+  def broadcast({:ok, %Comment{} = comment}, tag) do
     comment = get_comment_for_render!(comment.id)
     Phoenix.PubSub.broadcast(Seddit.PubSub, "post:" <> comment.post_id, {tag, comment})
 
@@ -33,7 +44,11 @@ defmodule Seddit.Posts do
 
   """
   def list_posts do
-    Repo.all(Post)
+    from(p in Post,
+      order_by: [desc: p.inserted_at],
+      preload: [:user]
+    )
+    |> Repo.all()
   end
 
   @doc """
@@ -78,6 +93,7 @@ defmodule Seddit.Posts do
     }
     |> Post.changeset(attrs)
     |> Repo.insert()
+    |> broadcast(:post_created)
   end
 
   @doc """
