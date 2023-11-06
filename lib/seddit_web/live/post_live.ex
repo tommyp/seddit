@@ -29,14 +29,16 @@ defmodule SedditWeb.PostLive do
         &larr; all posts
       </.link>
       <h1 class="text-6xl mb-6"><%= @post.title %></h1>
-      <h2 class="text-3xl mb-12 text-gray-600">Posted by <%= @post.user.email %></h2>
+      <h2 class="text-3xl mb-12 text-gray-600">
+        Posted <%= Timex.from_now(@post.inserted_at) %> by <%= @post.user.email %>
+      </h2>
       <p class="text-prose text-3xl mb-12"><%= @post.content %></p>
 
       <div class="w-2/3">
-        <h2 class="text-3xl mb-6 text-gray-600">Comments</h2>
+        <h2 class="text-3xl mb-4 text-gray-600">Comments</h2>
         <%= if Map.get(assigns, :current_user) do %>
-          <.simple_form for={@form} phx-submit="comment:create">
-            <.input type="textarea" field={@form[:content]} required="true" />
+          <.simple_form for={@form} phx-submit="comment:create" class="mb-6">
+            <.input type="textarea" field={@form[:content]} required="true" class="mb-0" />
             <:actions>
               <.button>
                 Post comment
@@ -45,8 +47,8 @@ defmodule SedditWeb.PostLive do
           </.simple_form>
         <% else %>
           <.link
-            class="inline-block mb-4 bg-black text-white p-3"
-            href={~p"/users/log_in?return_to=#{~p"/posts/#{@post.id}"}"}
+            class="inline-block mb-4 bg-zinc-900 text-white p-3 rounded-lg"
+            href={~p"/users/log_in"}
           >
             Sign in to post a comment
           </.link>
