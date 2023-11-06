@@ -1,7 +1,7 @@
 defmodule SedditWeb.PostLive do
-  alias Seddit.Posts.Comment
   use SedditWeb, :live_view
 
+  alias Seddit.Posts.Comment
   alias Seddit.Posts
 
   def mount(%{"id" => id}, _session, socket) do
@@ -25,18 +25,20 @@ defmodule SedditWeb.PostLive do
   def render(assigns) do
     ~H"""
     <section>
-      <.link href={~p"/"} class="hover:bg-black hover:text-white p-2 inline-block mb-2">
+      <.link_button href={~p"/"} class="p-2 inline-block mb-2">
         &larr; all posts
-      </.link>
+      </.link_button>
       <h1 class="text-6xl mb-6"><%= @post.title %></h1>
-      <h2 class="text-3xl mb-12 text-gray-600">Posted by <%= @post.user.email %></h2>
+      <h2 class="text-3xl mb-12 text-gray-600">
+        Posted <%= Timex.from_now(@post.inserted_at) %> by <%= @post.user.email %>
+      </h2>
       <p class="text-prose text-3xl mb-12"><%= @post.content %></p>
 
       <div class="w-2/3">
-        <h2 class="text-3xl mb-6 text-gray-600">Comments</h2>
+        <h2 class="text-3xl mb-4 text-gray-600">Comments</h2>
         <%= if Map.get(assigns, :current_user) do %>
-          <.simple_form for={@form} phx-submit="comment:create">
-            <.input type="textarea" field={@form[:content]} required="true" />
+          <.simple_form for={@form} phx-submit="comment:create" class="mb-6">
+            <.input type="textarea" field={@form[:content]} required="true" class="mb-0" />
             <:actions>
               <.button>
                 Post comment
@@ -44,12 +46,9 @@ defmodule SedditWeb.PostLive do
             </:actions>
           </.simple_form>
         <% else %>
-          <.link
-            class="inline-block mb-4 bg-black text-white p-3"
-            href={~p"/users/log_in?return_to=#{~p"/posts/#{@post.id}"}"}
-          >
+          <.link_button class="mb-4 inline-block text-white p-3 rounded-lg" href={~p"/users/log_in"}>
             Sign in to post a comment
-          </.link>
+          </.link_button>
         <% end %>
         <div :for={comment <- @comments} class="mb-6 pb-6 border-b-2 border-gray-300">
           <p class="text-prose text-2xl mb-2"><%= comment.content %></p>
