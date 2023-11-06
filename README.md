@@ -1,18 +1,22 @@
 # Seddit
 
-To start your Phoenix server:
+A little Reddit clone with Posts and Comments.
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+```
+mix setup
+mix ecto.setup
+```
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+The seeds file contains some Faker data for Users, Posts, and Comments.
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+```
+mix run priv/repo/seeds.exs
+```
 
-## Learn more
+To run the app:
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+```
+mix phx.server
+```
+
+And then visit [http://localhost:4000](http://localhost:4000).
