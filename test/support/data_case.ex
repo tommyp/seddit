@@ -55,4 +55,20 @@ defmodule Seddit.DataCase do
       end)
     end)
   end
+
+  def fields_equal?(struct1, struct2, fields_to_compare)
+      when is_struct(struct1) and is_struct(struct2) do
+    fields_to_compare
+    |> Enum.all?(fn field ->
+      Map.get(struct1, field) == Map.get(struct2, field)
+    end)
+  end
+
+  def fields_equal?(list1, list2, fields_to_compare) when is_list(list1) and is_list(list2) do
+    list1
+    |> Enum.with_index()
+    |> Enum.all?(fn {struct1, index} ->
+      fields_equal?(struct1, Enum.at(list2, index), fields_to_compare)
+    end)
+  end
 end
