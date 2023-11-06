@@ -11,6 +11,7 @@ defmodule Seddit.PostsTest do
     import Seddit.PostsFixtures
 
     @invalid_attrs %{title: nil, content: nil}
+    @fields_to_compare [:title, :content, :user_id]
 
     test "list_posts/0 returns all posts" do
       post = post_fixture()
@@ -19,7 +20,7 @@ defmodule Seddit.PostsTest do
 
     test "get_post!/1 returns the post with given id" do
       post = post_fixture()
-      assert Posts.get_post!(post.id) == post
+      assert fields_equal?(Posts.get_post!(post.id), post, @fields_to_compare)
     end
 
     test "create_post/1 with valid data creates a post" do
@@ -49,7 +50,7 @@ defmodule Seddit.PostsTest do
     test "update_post/2 with invalid data returns error changeset" do
       post = post_fixture()
       assert {:error, %Ecto.Changeset{}} = Posts.update_post(post, @invalid_attrs)
-      assert post == Posts.get_post!(post.id)
+      assert fields_equal?(post, Posts.get_post!(post.id), @fields_to_compare)
     end
 
     test "delete_post/1 deletes the post" do
@@ -71,7 +72,7 @@ defmodule Seddit.PostsTest do
 
     @invalid_attrs %{content: nil}
 
-    @comment_fields_to_compare [
+    @fields_to_compare [
       :content,
       :id,
       :inserted_at,
@@ -82,12 +83,12 @@ defmodule Seddit.PostsTest do
 
     test "list_comments/0 returns all comments" do
       comment = comment_fixture()
-      assert fields_equal?(Posts.list_comments(), [comment], @comment_fields_to_compare)
+      assert fields_equal?(Posts.list_comments(), [comment], @fields_to_compare)
     end
 
     test "get_comment!/1 returns the comment with given id" do
       comment = comment_fixture()
-      assert fields_equal?(Posts.get_comment!(comment.id), comment, @comment_fields_to_compare)
+      assert fields_equal?(Posts.get_comment!(comment.id), comment, @fields_to_compare)
     end
 
     test "create_comment/1 with valid data creates a comment" do
@@ -116,7 +117,7 @@ defmodule Seddit.PostsTest do
       comment = comment_fixture()
       assert {:error, %Ecto.Changeset{}} = Posts.update_comment(comment, @invalid_attrs)
 
-      assert fields_equal?(comment, Posts.get_comment!(comment.id), @comment_fields_to_compare)
+      assert fields_equal?(comment, Posts.get_comment!(comment.id), @fields_to_compare)
     end
 
     test "delete_comment/1 deletes the comment" do

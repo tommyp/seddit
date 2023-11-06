@@ -1,8 +1,13 @@
 defmodule SedditWeb.PostsLive do
   use SedditWeb, :live_view
+  alias Seddit.Posts.Post
 
   def mount(_params, _session, socket) do
     socket = assign(socket, :posts, Seddit.Posts.list_posts())
+
+    if connected?(socket) do
+      Phoenix.PubSub.subscribe(Seddit.PubSub, "posts")
+    end
 
     {:ok, socket}
   end
@@ -18,17 +23,21 @@ defmodule SedditWeb.PostsLive do
       </header>
       <ul>
         <li :for={post <- @posts} class="last:border-0 border-b-2 border-gray-700">
-          <h2 class="">
-            <.link
-              class="text-6xl hover:text-white hover:bg-black py-6 block"
-              href={~p"/posts/#{post.id}"}
-            >
+          <.link class=" hover:text-white hover:bg-black pt-6 pb-3 block" href={~p"/posts/#{post.id}"}>
+            <h2 class="text-6xl">
               <%= post.title %>
-            </.link>
-          </h2>
+            </h2>
+            <h3 class="mb-0">
+              Posted <%= Timex.from_now(post.inserted_at) %> by <%= post.user.email %>
+            </h3>
+          </.link>
         </li>
       </ul>
     </section>
     """
+  end
+
+  def handle_info({:post_created, %Post{} = post}, socket) do
+    {:noreply, assign(socket, posts: [post | socket.assigns.posts])}
   end
 end
