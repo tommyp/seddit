@@ -71,14 +71,23 @@ defmodule Seddit.PostsTest do
 
     @invalid_attrs %{content: nil}
 
+    @comment_fields_to_compare [
+      :content,
+      :id,
+      :inserted_at,
+      :post_id,
+      :updated_at,
+      :user_id
+    ]
+
     test "list_comments/0 returns all comments" do
       comment = comment_fixture()
-      assert Posts.list_comments() == [comment]
+      assert fields_equal?(Posts.list_comments(), [comment], @comment_fields_to_compare)
     end
 
     test "get_comment!/1 returns the comment with given id" do
       comment = comment_fixture()
-      assert Posts.get_comment!(comment.id) == comment
+      assert fields_equal?(Posts.get_comment!(comment.id), comment, @comment_fields_to_compare)
     end
 
     test "create_comment/1 with valid data creates a comment" do
@@ -106,7 +115,8 @@ defmodule Seddit.PostsTest do
     test "update_comment/2 with invalid data returns error changeset" do
       comment = comment_fixture()
       assert {:error, %Ecto.Changeset{}} = Posts.update_comment(comment, @invalid_attrs)
-      assert comment == Posts.get_comment!(comment.id)
+
+      assert fields_equal?(comment, Posts.get_comment!(comment.id), @comment_fields_to_compare)
     end
 
     test "delete_comment/1 deletes the comment" do

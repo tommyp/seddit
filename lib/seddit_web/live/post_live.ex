@@ -5,10 +5,17 @@ defmodule SedditWeb.PostLive do
   alias Seddit.Posts
 
   def mount(%{"id" => id}, _session, socket) do
+    post = Posts.get_post_for_render!(id)
+
+    if connected?(socket) do
+      Posts.subscribe(post.id)
+    end
+
     socket =
       socket
       |> assign(
-        post: Posts.get_post_for_render!(id),
+        post: post,
+        comments: Posts.list_comments_for_post(post),
         form: to_form(Posts.change_comment(%Comment{}))
       )
 
@@ -44,9 +51,11 @@ defmodule SedditWeb.PostLive do
             Sign in to post a comment
           </.link>
         <% end %>
-        <div :for={comment <- @post.comments} class="mb-6 pb-6 border-b-2 border-gray-300">
+        <div :for={comment <- @comments} class="mb-6 pb-6 border-b-2 border-gray-300">
           <p class="text-prose text-2xl mb-2"><%= comment.content %></p>
-          <p class="text-gray-600 text-xl">Posted by <%= comment.user.email %></p>
+          <p class="text-gray-600 text-xl">
+            Posted <%= Timex.from_now(comment.inserted_at) %> by <%= comment.user.email %>
+          </p>
         </div>
       </div>
     </section>
@@ -59,7 +68,7 @@ defmodule SedditWeb.PostLive do
     socket =
       case Posts.create_comment(current_user, post, comment_params) do
         {:ok, _comment} ->
-          assign(socket, post: Posts.get_post_for_render!(post.id))
+          assign(socket, form: to_form(Posts.change_comment(%Comment{})))
 
         {:error, changeset} ->
           socket
@@ -68,5 +77,9 @@ defmodule SedditWeb.PostLive do
       end
 
     {:noreply, socket}
+  end
+
+  def handle_info({:comment_created, %Comment{} = comment}, socket) do
+    {:noreply, assign(socket, comments: [comment | socket.assigns.comments])}
   end
 end
